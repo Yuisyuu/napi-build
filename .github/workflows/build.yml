@@ -22,12 +22,12 @@ jobs:
           git clone https://github.com/jasongin/nodejs -b napi-libnode-${{ matrix.version }} --single-branch .
 
       - name: Build on *nix
-        if: matrix.os != "windows-latest"
+        if: ${{ matrix.os != "windows-latest" }}
         run: |
           ./configure --shared; make -j4
 
       - name: Build on Windows
-        if: matrix.os == "windows-latest"
+        if: ${{ matrix.os == "windows-latest" }}
         run: |
           .\vcbuild.bat x64 release dll openssl-no-asm
 
