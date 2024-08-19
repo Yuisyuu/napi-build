@@ -5,32 +5,34 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
 
     strategy:
       fail-fast: false
 
       matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
+        os: [macos, ubuntu, windows]
         version: [v20.9.0]
 
     steps:
       - name: Checkout
-        run: |
-          git clone https://github.com/jasongin/nodejs -b napi-libnode-${{ matrix.version }} --single-branch .
+        uses: actions/checkout@v4.1.7
+        with:
+          repository: jasongin/nodejs
+          ref: napi-libnode-${{ matrix.version }}
 
       - name: Build on *nix
-        if: ${{ matrix.os != 'windows-latest' }}
+        if: ${{ matrix.os != 'windows' }}
         run: |
           ./configure --shared; make -j4
 
       - name: Build on Windows
-        if: ${{ matrix.os == 'windows-latest' }}
+        if: ${{ matrix.os == 'windows' }}
         run: |
           .\vcbuild.bat x64 release dll openssl-no-asm
 
       - uses: actions/upload-artifact@v4.3.6
         with:
-          name: napi-${{ matrix.os }}-amd64-${{ matrix.version }}
+          name: libnode-${{ matrix.os }}-amd64-${{ matrix.version }}
           path: |
             out/Release
